@@ -410,6 +410,25 @@ html, body {
 
 @keyframes pop { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(2.5)} }
 .pulse-dot.go { animation: pop 0.9s ease-out forwards; }
+
+/* ── TITLE BAR ── */
+.title-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px 3px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: 2px;
+  gap: 0;
+}
+.title-bar .sep { margin: 0 10px; opacity: 0.3; }
+.title-bar .highlight { color: var(--yellow); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -420,6 +439,15 @@ html, body {
 <button class="theme-btn" id="themeBtn" title="Cambiar tema">☀️</button>
 
 <div class="dashboard">
+
+  <!-- ═══ TITLE BAR ═══════════════════════════════════════ -->
+  <div class="title-bar">
+    <span>Estación Meteorológica</span>
+    <span class="sep">//</span>
+    <span class="highlight">Tunquén El Rosario</span>
+    <span class="sep">//</span>
+    <span>pc 119</span>
+  </div>
 
   <!-- ═══ TOP ROW ══════════════════════════════════════════ -->
   <div class="top-row">
@@ -588,7 +616,7 @@ const CFG = {
   FORECAST_POLL: 5 * 60_000,
   RELOAD: 6 * 60 * 60 * 1000,
   DESIGN_W: 1024,
-  DESIGN_H: 760,
+  DESIGN_H: 790,
 };
 
 const API_BASE = `https://swd.weatherflow.com/swd/rest`;
