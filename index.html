@@ -548,7 +548,7 @@ html, body {
 
     <!-- Wind speed & gust -->
     <div class="card">
-      <div class="label">Viento y ráfaga, m/s</div>
+      <div class="label">Viento y ráfaga, nudos</div>
       <div class="wind-vals">
         <span class="big-num" id="windSpd">--</span>
         <span class="smol">prom</span>
@@ -560,7 +560,7 @@ html, body {
         <div class="g-marker" id="windMark" style="left:0%"></div>
         <div class="g-marker" id="gustMark" style="left:0%;background:var(--orange);border-color:var(--orange)"></div>
       </div>
-      <div class="g-scale"><span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span></div>
+      <div class="g-scale"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span></div>
     </div>
 
     <!-- Barometric pressure -->
@@ -1025,7 +1025,7 @@ async function update() {
     setMark('uvMark', (uv/12)*100);
 
     // ── Precip intensity bar (0–50 mm/h)
-    gradBar('precipCvs', [[0,cv('--blue')],[0.5,'#ab47bc'],[1,cv('--red')]]);
+    gradBar('precipCvs', [[0,cv('--blue')],[0.5,'#0288d1'],[1,'#01579b']]);
     setMark('precipMark', Math.min(100, (rainRate/50)*100));
 
     // ── Accumulation bar (0–75 mm)
@@ -1043,12 +1043,15 @@ async function update() {
     // ── Compass
     drawCompass(windDir);
 
-    // ── Wind bar (0–25 m/s)
+    // ── Wind bar (0–50 knots)
+    const MPS_TO_KT = 1.94384;
+    const windSpdKt  = windSpd  * MPS_TO_KT;
+    const windGustKt = windGust * MPS_TO_KT;
     gradBar('windCvs', [[0,cv('--green')],[0.5,cv('--yellow')],[1,cv('--red')]]);
-    setMark('windMark', Math.min(100, (windSpd/25)*100));
-    setMark('gustMark', Math.min(100, (windGust/25)*100));
-    document.getElementById('windSpd').textContent  = windSpd.toFixed(1);
-    document.getElementById('windGust').textContent = windGust.toFixed(1);
+    setMark('windMark', Math.min(100, (windSpdKt/50)*100));
+    setMark('gustMark', Math.min(100, (windGustKt/50)*100));
+    document.getElementById('windSpd').textContent  = windSpdKt.toFixed(1);
+    document.getElementById('windGust').textContent = windGustKt.toFixed(1);
 
     // ── Pressure
     document.getElementById('presVal').textContent = pressure.toFixed(1);
