@@ -529,8 +529,8 @@ html, body {
     <div class="col-right">
       <div class="card">
         <div class="label" style="text-align:center">Humedad</div>
-        <svg id="humidSvg" viewBox="0 0 160 120" style="width:100%;max-width:190px;height:auto"></svg>
-        <div class="humid-val" style="text-align:center">
+        <svg id="humidSvg" viewBox="0 0 160 135" style="width:100%;max-width:190px;height:auto"></svg>
+        <div class="humid-val" style="text-align:center;margin-top:-6px">
           <span id="humidVal">--</span><span class="unit">%</span>
         </div>
       </div>
@@ -845,7 +845,7 @@ function arcD(cx,cy,r,s,e) {
 function drawHumidity(val) {
   const svg=document.getElementById('humidSvg');
   svg.innerHTML='';
-  const cx=80,cy=90,r=62,S=-135,span=270;
+  const cx=80,cy=82,r=62,S=-135,span=270;
   svg.appendChild(svgEl('path',{d:arcD(cx,cy,r,S,S+span),
     fill:'none',stroke:cv('--svg-track'),'stroke-width':9,'stroke-linecap':'round'}));
   const filled = S+(val/100)*span;
