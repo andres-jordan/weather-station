@@ -455,7 +455,7 @@ html, body {
     <!-- Col 1: Forecast clock -->
     <div class="col-forecast">
       <div class="card forecast-card">
-        <div class="label">Pronóstico 24 horas</div>
+        <div class="label">Pronóstico 12 horas</div>
         <svg id="forecastSvg" viewBox="0 0 224 234"></svg>
       </div>
     </div>
@@ -772,41 +772,21 @@ let _fcastData = [];
 function drawForecast() {
   const svg = document.getElementById('forecastSvg');
   svg.innerHTML = '';
-  const cx=112, cy=117, R=86;
+  const cx=112, cy=117, R=82;
 
   svg.appendChild(svgEl('circle',{cx,cy,r:R+16,fill:cv('--svg-ring'),stroke:cv('--svg-ring-str'),'stroke-width':1}));
   svg.appendChild(svgEl('circle',{cx,cy,r:R-16,fill:cv('--svg-ring'),stroke:cv('--svg-ring-str'),'stroke-width':1}));
-
-  // Draw 24 tick marks at each hour position
-  for (let h=0; h<24; h++) {
-    const ang = (h/24)*2*Math.PI - Math.PI/2;
-    const isMajor = h % 6 === 0;
-    const r1 = R+12, r2 = R + (isMajor ? 18 : 14);
-    const x1 = cx+r1*Math.cos(ang), y1 = cy+r1*Math.sin(ang);
-    const x2 = cx+r2*Math.cos(ang), y2 = cy+r2*Math.sin(ang);
-    svg.appendChild(svgEl('line',{x1,y1,x2,y2,
-      stroke: isMajor ? cv('--svg-tick') : cv('--svg-ring-str'),
-      'stroke-width': isMajor ? '1.5' : '1'}));
-  }
-
-  // Cardinal hour labels: 0, 6, 12, 18
-  [[0,'0'],[6,'6'],[12,'12'],[18,'18']].forEach(([h,lbl])=>{
-    const ang = (h/24)*2*Math.PI - Math.PI/2;
-    const lx = cx+(R+26)*Math.cos(ang);
-    const ly = cy+(R+26)*Math.sin(ang);
-    svgText(svg, lx, ly, lbl, {fill:cv('--svg-text'),'font-size':'10','font-weight':'600'});
-  });
 
   const now = new Date();
   const nowHour = new Date(now); nowHour.setMinutes(0,0,0,0);
   const upcoming = _fcastData.filter(h => new Date(h.time * 1000) >= nowHour);
 
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < 12; i++) {
     const h = upcoming[i];
     if (!h) continue;
     const dt = new Date(h.time * 1000);
     const hh = dt.getHours();
-    const ang = (hh / 24) * 2 * Math.PI - Math.PI / 2;
+    const ang = ((hh % 12) / 12) * 2 * Math.PI - Math.PI / 2;
     const px = cx + R * Math.cos(ang);
     const py = cy + R * Math.sin(ang);
 
@@ -819,23 +799,24 @@ function drawForecast() {
     else if (cond.includes('fog')) color = '#78909c';
 
     const prob = h.precip_probability ?? 0;
-    // Smaller dots for 24h to avoid crowding (max 9 vs 13 before)
-    const dotR = 4 + (prob/100)*5;
-    // Fade future hours slightly; first dot is brightest
-    const opacity = i === 0 ? 1 : (0.85 - i * 0.015).toFixed(2);
-    svg.appendChild(svgEl('circle',{cx:px,cy:py,r:dotR,fill:color,opacity}));
+    const dotR = 5 + (prob/100)*6;
+    svg.appendChild(svgEl('circle',{cx:px,cy:py,r:dotR,fill:color,opacity:i===0?'1':'0.72'}));
 
-    // Show temp label only every 3 hours to avoid crowding
+    const lbl = hh===0?'12a': hh<12?`${hh}a`: hh===12?'12p':`${hh-12}p`;
+    const lx = cx+(R+22)*Math.cos(ang);
+    const ly = cy+(R+22)*Math.sin(ang);
+    svgText(svg, lx, ly, lbl, {fill:cv('--svg-text'),'font-size':'10'});
+
     const temp = h.air_temperature ?? null;
-    if (temp != null && hh % 3 === 0) {
+    if (temp != null) {
       const tx = cx+(R-22)*Math.cos(ang);
       const ty = cy+(R-22)*Math.sin(ang);
-      svgText(svg, tx, ty, `${Math.round(temp)}°`, {fill:cv('--svg-text-in'),'font-size':'8.5'});
+      svgText(svg, tx, ty, `${Math.round(temp)}°`, {fill:cv('--svg-text-in'),'font-size':'9.5'});
     }
   }
 
-  // Current time hand — 24h
-  const nowAng = ((now.getHours() + now.getMinutes()/60) / 24) * 2 * Math.PI - Math.PI / 2;
+  // Current time hand — 12h
+  const nowAng = ((now.getHours() % 12 + now.getMinutes()/60) / 12) * 2 * Math.PI - Math.PI / 2;
   const li1 = {x:cx+(R-10)*Math.cos(nowAng), y:cy+(R-10)*Math.sin(nowAng)};
   const lo1 = {x:cx+(R+10)*Math.cos(nowAng), y:cy+(R+10)*Math.sin(nowAng)};
   svg.appendChild(svgEl('line',{x1:li1.x,y1:li1.y,x2:lo1.x,y2:lo1.y,
